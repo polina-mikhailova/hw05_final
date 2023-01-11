@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% load cache %}
+{% block title %}Подписки пользователя {{ post.author.get_full_name }}{% endblock %}
+   
+{% block content %}
+  <div class="container py-5">     
+    <h1>Подписки пользователя {{ post.author.username }}</h1>
+    {% include 'posts/includes/switcher.html' %}
+    {% cache 20 index_page %}
+      {% for post in page_obj%}
+        {% if post.author == following %}
+          {% include 'posts/includes/post_list.html' %}
+        {% endif %}
+        {% if post.group %}   
+          <br><a href={% url 'posts:group_list' post.group.slug %}>все записи группы {{ post.group.title }}</a>
+        {% endif %}
+        {% if not forloop.last %} <hr> {% endif %}
+      {% endfor %}
+    {% endcache %}
+    {% include 'posts/includes/paginator.html' %}
+  </div>
+{% endblock %}
