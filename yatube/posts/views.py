@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import CommentForm, PostForm
 from .models import Comment, Follow, Group, Post, User
-from .paginator import paginate_page
+from .utils import paginate_page
 
 
 def index(request):
@@ -28,11 +28,15 @@ def group_posts(request, slug):
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
+    user = request.user
     template = 'posts/profile.html'
     posts = author.posts.prefetch_related('group')
     following = request.user.is_authenticated
     if following:
-        following = author.following.exists()
+        if author != user:
+            following = Follow.objects.filter(
+                user=user, author=author
+            ).exists()
     posts_count = author.posts.count()
     context = {
         'author': author,
@@ -137,6 +141,8 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
+    author = get_object_or_404(User, username=username) 
     user = request.user
-    Follow.objects.filter(user=user, author__username=username).delete()
+    if author != user:
+        Follow.objects.filter(user=user, author=author).delete()
     return redirect('posts:profile', username=username)

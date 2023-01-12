@@ -5,7 +5,9 @@
 {% block content %}
   <div class="container py-5">     
     <h1>Подписки пользователя {{ post.author.username }}</h1>
-    {% include 'posts/includes/switcher.html' %}
+    {% with nav_link='Избранные авторы' %}
+      {% include 'posts/includes/switcher.html' %}
+    {% endwith %}
     {% cache 20 index_page %}
       {% for post in page_obj%}
         {% if post.author == following %}

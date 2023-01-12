@@ -82,11 +82,12 @@ class Comment(CreatedModel):
         help_text='Текст нового комментария'
     )
 
-    def __str__(self) -> str:
-        return self.text
 
     class Meta:
         ordering = ['-created']
+
+    def __str__(self) -> str:
+        return self.text
 
 
 class Follow(CreatedModel):
