@@ -82,7 +82,6 @@ class Comment(CreatedModel):
         help_text='Текст нового комментария'
     )
 
-
     class Meta:
         ordering = ['-created']
 
