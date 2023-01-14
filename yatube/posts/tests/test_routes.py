@@ -25,22 +25,30 @@ class PostURLTest(TestCase):
         cls.POST_DETAIL_PAGE_ADDRESS = f'/posts/{cls.post.id}/'
         cls.CREATE_PAGE_ADDRESS = '/create/'
         cls.POST_EDIT_PAGE_ADDRESS = f'/posts/{cls.post.id}/edit/'
+        cls.POST_COMMENT_PAGE_ADDRESS = f'/posts/{cls.post.id}/comment/'
+        cls.FOLLOW_INDEX_PAGE_ADDRESS = '/follow/'
+        cls.PROFILE_FOLLOW_PAGE_ADDRESS = (
+            f'/profile/{cls.user.username}/follow/'
+        )
+        cls.PROFILE_UNFOLLOW_PAGE_ADDRESS = (
+            f'/profile/{cls.user.username}/unfollow/'
+        )
 
     def test_routes_give_correct_urls(self):
         """Расчеты дают ожидаемые явные URLы."""
         test_data = (
             (c.INDEX_URL_NAME, None, self.INDEX_PAGE_ADDRESS),
-            (c.GROUP_LIST_URL_NAME, {'slug': self.group.slug},
-             self.GROUP_PAGE_ADDRESS),
-            (c.PROFILE_URL_NAME, {'username': self.user.username},
-             self.PROFILE_PAGE_ADDRESS),
-            (c.POST_DETAIL_URL_NAME, {'post_id': f'{self.post.id}'},
-             self.POST_DETAIL_PAGE_ADDRESS),
+            (c.GROUP_LIST_URL_NAME, [self.group.slug], self.GROUP_PAGE_ADDRESS),
+            (c.PROFILE_URL_NAME, [self.user.username], self.PROFILE_PAGE_ADDRESS),
+            (c.POST_DETAIL_URL_NAME, [self.post.id], self.POST_DETAIL_PAGE_ADDRESS),
             (c.POST_CREATE_URL_NAME, None, self.CREATE_PAGE_ADDRESS),
-            (c.POST_EDIT_URL_NAME, {'post_id': f'{self.post.id}'},
-             self.POST_EDIT_PAGE_ADDRESS)
+            (c.POST_EDIT_URL_NAME, [self.post.id], self.POST_EDIT_PAGE_ADDRESS),
+            (c.POST_COMMENT_URL_NAME, [self.post.id], self.POST_COMMENT_PAGE_ADDRESS),
+            (c.FOLLOW_INDEX_URL_NAME, None, self.FOLLOW_INDEX_PAGE_ADDRESS),
+            (c.PROFILE_FOLLOW_URL_NAME, [self.user.username], self.PROFILE_FOLLOW_PAGE_ADDRESS),
+            (c.PROFILE_UNFOLLOW_URL_NAME, [self.user.username], self.PROFILE_UNFOLLOW_PAGE_ADDRESS)
         )
-        for data in test_data:
+        for url, args, address in test_data:
             with self.subTest():
-                reversed = reverse(data[0], kwargs=data[1],)
-                self.assertEqual(reversed, data[2])
+                reversed = reverse(url, args=args,)
+                self.assertEqual(reversed, address)

@@ -6,7 +6,7 @@
   <div class="container py-5">     
     <h1>Последние обновления на сайте</h1>
     {% with nav_link='Все авторы' %}
-      {% include 'posts/includes/switcher.html' %}
+      {% include 'posts/includes/switcher.html'  with index=True  %}
     {% endwith %}
     {% cache 20 index_page %}
       {% for post in page_obj%}

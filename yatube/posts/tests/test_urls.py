@@ -33,7 +33,7 @@ class PostURLTest(TestCase):
             f'profile/{cls.user.username}/follow/'
         )
         cls.PROFILE_UNFOLLOW_PAGE_ADDRESS = (
-            f'profile/{cls.user.username}/follow/'
+            f'profile/{cls.user.username}/unfollow/'
         )
         cls.UNEXISTING_PAGE = '/unexisting_page/'
 
@@ -82,10 +82,10 @@ class PostURLTest(TestCase):
             (self.FOLLOW_INDEX_PAGE_ADDRESS, self.authorized_client,
              HTTPStatus.OK),
         )
-        for data in test_data:
-            with self.subTest(data=data):
-                response = data[1].get(data[0])
-                self.assertEqual(response.status_code, data[2])
+        for address, client, status in test_data:
+            with self.subTest(address=address):
+                response = client.get(address)
+                self.assertEqual(response.status_code, status)
 
     def test_posts_edit_url_access_only_for_author(self):
         """Страница /posts/<post_id>/edit/ доступна только автору поста."""

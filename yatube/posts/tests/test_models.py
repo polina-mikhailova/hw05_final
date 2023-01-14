@@ -17,13 +17,19 @@ class PostModelTest(TestCase):
             author=cls.user,
             text='Тестовый пост',
         )
+        cls.comment = Comment.objects.create(
+            post=cls.post,
+            author=cls.user,
+            text='Тестовый комментарий',
+        )
 
     def test_models_have_correct_object_names(self):
         """Проверяем, что у моделей корректно работает __str__."""
         test_data = {
             self.group.title: str(self.group),
             self.post.text[:MAX_SYMBOLS_STR_POST]:
-            str(self.post)
+            str(self.post),
+            self.comment.text: str(self.comment)
         }
         for field, expected_value in test_data.items():
             with self.subTest(field=field):
@@ -31,35 +37,49 @@ class PostModelTest(TestCase):
 
     def test_verbose_name(self):
         """verbose_name в полях моделей совпадает с ожидаемым."""
-        test_data = (
-            ('author', 'Автор', Post),
-            ('group', 'Группа', Post),
-            ('text', 'Текст поста', Post),
-            ('image', 'Картинка', Post),
-            ('pub_date', 'Дата публикации', Post),
-            ('title', 'Название группы', Group),
-            ('description', 'Описание группы', Group),
-            ('post', 'Комментарий', Comment),
-            ('author', 'Автор', Comment),
-            ('author', 'Автор', Follow),
-            ('user', 'Подписчик', Follow),
-        )
-        for data in test_data:
-            with self.subTest():
-                self.assertEqual(
-                    data[2]._meta.get_field(data[0]).verbose_name, data[1])
+        test_data = {
+            Post: {
+                'author': 'Автор',
+                'text': 'Текст поста',
+                'image': 'Картинка',
+                'group': 'Группа',
+                'pub_date': 'Дата публикации'
+            },
+            Group: {
+                'title': 'Название группы',
+                'description': 'Описание группы'
+            },
+            Comment: {
+                'post': 'Комментарий',
+                'author': 'Автор'
+            },
+            Follow: {
+                'author': 'Автор',
+                'user': 'Подписчик'
+            },
+        }
+        for model, fields in test_data.items():
+            for field, expected_value in fields.items():
+                with self.subTest():
+                    self.assertEqual(
+                        model._meta.get_field(field).verbose_name, expected_value)
 
     def test_help_text_post(self):
         """help_text в полях моделей совпадает с ожидаемым."""
-        test_data = (
-            ('text', 'Текст нового поста', Post),
-            ('group', 'Группа, к которой будет относиться пост', Post),
-            ('image', 'Вы можете добавить изображение к вашему посту', Post),
-            ('title', 'Введите название группы', Group),
-            ('description', 'Добавьте описание новой группы', Group),
-            ('text', 'Текст нового комментария', Comment),
-        )
-        for data in test_data:
-            with self.subTest():
-                self.assertEqual(
-                    data[2]._meta.get_field(data[0]).help_text, data[1])
+        test_data = {
+            Post: {
+                'text': 'Текст нового поста',
+                'image': 'Вы можете добавить изображение к вашему посту',
+                'group': 'Группа, к которой будет относиться пост'
+            },
+            Group: {
+                'title': 'Введите название группы',
+                'description': 'Добавьте описание новой группы'
+            },
+            Comment: {'text': 'Текст нового комментария'},
+        }
+        for model, fields in test_data.items():
+            for field, expected_value in fields.items():
+                with self.subTest():
+                    self.assertEqual(
+                        model._meta.get_field(field).help_text, expected_value)

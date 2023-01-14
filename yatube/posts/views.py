@@ -4,13 +4,14 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .forms import CommentForm, PostForm
 from .models import Comment, Follow, Group, Post, User
 from .utils import paginate_page
-
+from yatube.settings import LATEST_POSTS_COUNT
 
 def index(request):
     posts = Post.objects.all()
     template = 'posts/index.html'
+    paginator_number = LATEST_POSTS_COUNT
     context = {
-        'page_obj': paginate_page(posts, request)
+        'page_obj': paginate_page(posts, request, paginator_number)
     }
     return render(request, template, context)
 
@@ -19,28 +20,29 @@ def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     template = 'posts/group_list.html'
     posts = group.posts.select_related('author', 'group')
+    paginator_number = LATEST_POSTS_COUNT
     context = {
         'group': group,
-        'page_obj': paginate_page(posts, request)
+        'page_obj': paginate_page(posts, request, paginator_number)
     }
     return render(request, template, context)
 
 
 def profile(request, username):
     author = get_object_or_404(User, username=username)
-    user = request.user
     template = 'posts/profile.html'
     posts = author.posts.prefetch_related('group')
-    following = request.user.is_authenticated
-    if following:
-        if author != user:
-            following = Follow.objects.filter(
-                user=user, author=author
+    following = (
+        request.user.is_authenticated
+        and Follow.objects.filter( 
+                user=request.user, author=author 
             ).exists()
+    )
     posts_count = author.posts.count()
+    paginator_number = LATEST_POSTS_COUNT
     context = {
         'author': author,
-        'page_obj': paginate_page(posts, request),
+        'page_obj': paginate_page(posts, request, paginator_number),
         'following': following,
         'posts_count': posts_count
     }
@@ -124,8 +126,9 @@ def follow_index(request):
         'author',
         'group'
     ).filter(author__following__user=request.user)
+    paginator_number = LATEST_POSTS_COUNT
     context = {
-        'page_obj': paginate_page(posts, request),
+        'page_obj': paginate_page(posts, request, paginator_number),
     }
     return render(request, template, context)
 
@@ -143,6 +146,6 @@ def profile_follow(request, username):
 def profile_unfollow(request, username):
     author = get_object_or_404(User, username=username)
     user = request.user
-    if author != user:
-        Follow.objects.filter(user=user, author=author).delete()
+    if author != user: 
+        get_object_or_404(Follow, user=user, author=author).delete() 
     return redirect('posts:profile', username=username)
