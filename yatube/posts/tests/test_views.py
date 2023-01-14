@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from . import constants as c
 from ..models import Group, Post, User
-from yatube.settings import LATEST_POSTS_COUNT
+from yatube.settings import PAGINATOR_AMOUNT
 
 
 class PostViewTests(TestCase):
@@ -23,8 +23,7 @@ class PostViewTests(TestCase):
             text='Тестовый пост',
         )
         cls.TOTAL_POSTS = 13
-        cls.PAGINATOR_AMOUNT = LATEST_POSTS_COUNT
-        cls.SECOND_PAGE = cls.TOTAL_POSTS - cls.PAGINATOR_AMOUNT
+        cls.SECOND_PAGE = cls.TOTAL_POSTS - PAGINATOR_AMOUNT
 
         cls.INDEX_REVERSE = reverse(c.INDEX_URL_NAME)
         cls.GROUP_LIST_REVERSE = reverse(c.GROUP_LIST_URL_NAME,
