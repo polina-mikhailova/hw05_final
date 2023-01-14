@@ -6,6 +6,7 @@ from .models import Comment, Follow, Group, Post, User
 from .utils import paginate_page
 from yatube.settings import LATEST_POSTS_COUNT
 
+
 def index(request):
     posts = Post.objects.all()
     template = 'posts/index.html'
@@ -34,9 +35,9 @@ def profile(request, username):
     posts = author.posts.prefetch_related('group')
     following = (
         request.user.is_authenticated
-        and Follow.objects.filter( 
-                user=request.user, author=author 
-            ).exists()
+        and Follow.objects.filter(
+            user=request.user, author=author
+        ).exists()
     )
     posts_count = author.posts.count()
     paginator_number = LATEST_POSTS_COUNT
@@ -146,6 +147,6 @@ def profile_follow(request, username):
 def profile_unfollow(request, username):
     author = get_object_or_404(User, username=username)
     user = request.user
-    if author != user: 
-        get_object_or_404(Follow, user=user, author=author).delete() 
+    if author != user:
+        get_object_or_404(Follow, user=user, author=author).delete()
     return redirect('posts:profile', username=username)
